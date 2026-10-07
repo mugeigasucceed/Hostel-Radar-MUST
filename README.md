@@ -1,4 +1,4 @@
-# 🏠 Room Radar - Hostel Finder for MUST Students
+# 🏠 Hostel Radar - Hostel Finder for MUST Students
 
 **A secure, responsive web application for finding verified student accommodation near Mbarara University of Science and Technology (MUST).**
 
@@ -503,4 +503,4 @@ Built as a secure, educational demonstration of:
 2. **Security Details**: [SECURITY.md](./SECURITY.md)
 3. **API Reference**: [API_DOCUMENTATION.md](./API_DOCUMENTATION.md)
 
-**Happy coding! Welcome to Room Radar 🏠**
+**Happy coding! Welcome to Hostel Radar 🏠**
