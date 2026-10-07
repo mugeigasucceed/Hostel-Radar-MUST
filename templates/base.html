@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Hostel Radar - Find verified accommodation near MUST">
+    <meta name="theme-color" content="#1D3557">
+    <title>{% block title %}Hostel Radar - Hostel Finder for MUST{% endblock %}</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+    <nav class="navbar">
+        <div class="container">
+            <div class="navbar-content">
+                <div class="navbar-brand">
+                                           <a href="{{ url_for('index') }}" class="logo">
+                        <span>Hostel Radar</span>
+                        <span class="logo-dash">-</span>
+                        <img src="{{ url_for('static', filename='images/must-logo.png') }}" alt="MUST" class="brand-crest" onerror="this.style.display='none'">
+                    </a>
+                </div>
+
+                <ul class="navbar-menu" id="navMenu">
+                    {% if current_user.is_authenticated %}
+                        <li><a href="{{ url_for('hostels.dashboard') }}">Browse</a></li>
+                        {% if current_user.is_landlord() %}
+                            <li><a href="{{ url_for('hostels.my_listings') }}">My Listings</a></li>
+                        {% endif %}
+                        {% if current_user.is_admin() %}
+                            <li><a href="{{ url_for('admin.dashboard') }}">Admin</a></li>
+                        {% endif %}
+                        <li class="dropdown">
+                            <a href="#" class="dropdown-toggle">{{ current_user.full_name }}</a>
+                            <div class="dropdown-menu">
+                                <a href="{{ url_for('auth.profile') }}">Profile</a>
+                                <a href="{{ url_for('auth.change_password') }}">Change Password</a>
+                                <form method="POST" action="{{ url_for('auth.logout') }}" style="margin:0;">
+                                    <button type="submit" class="logout-btn">Log out</button>
+                                </form>
+                            </div>
+                        </li>
+                    {% else %}
+                        <li><a href="{{ url_for('index') }}">Log in</a></li>
+                        <li><a href="{{ url_for('auth.register') }}" class="btn-primary">Get started</a></li>
+                    {% endif %}
+                </ul>
+
+                <button class="mobile-menu-toggle" id="mobileMenuBtn" aria-label="Toggle menu">
+                    <span></span><span></span><span></span>
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                <div class="alert alert-{{ category }}">
+                    <div class="container">
+                        <span>{{ message }}</span>
+                        <button type="button" class="alert-close" onclick="this.closest('.alert').style.display='none';" aria-label="Dismiss">&times;</button>
+                    </div>
+                </div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+
+    <main class="main-content">
+        {% block content %}{% endblock %}
+    </main>
+
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h4>Hostel Radar</h4>
+                    <p>Verified student accommodation near Mbarara University of Science and Technology.</p>
+                </div>
+                <div class="footer-section">
+                    <h4>Quick links</h4>
+                    <ul>
+                        <li><a href="{{ url_for('index') }}">Home</a></li>
+                        {% if current_user.is_authenticated %}
+                            <li><a href="{{ url_for('hostels.dashboard') }}">Browse hostels</a></li>
+                        {% endif %}
+                                               <li><a href="{{ url_for('contact') }}">Contact & Support</a></li>
+                                               <li><a href="{{ url_for('terms') }}">Terms & Conditions</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h4>For landlords</h4>
+                    <ul>
+                        <li><a href="{{ url_for('auth.register') }}">List your hostel</a></li>
+                    </ul>
+                </div>
+            </div>
+                          <div class="footer-bottom">
+                <div>
+                    <p>&copy; {{ current_year }} Hostel Radar. All rights reserved.</p>
+                    <p style="margin-top:4px; opacity:0.75;">Developed by Succeed Charter Technologies</p>
+                </div>
+                <a href="#" class="back-to-top">&uarr; Back to top</a>
+            </div>
+        </div>
+    </footer>
+
+    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+    {% block extra_js %}{% endblock %}
+
+<div id="offline-banner" style="display:none; position:fixed; top:0; left:0; right:0; z-index:9999; background:#1D3557; color:#fff; padding:14px 20px; text-align:center; font-size:14px; font-weight:600;">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#FCB900" stroke-width="2" style="vertical-align:middle; margin-right:8px;"><path d="M1 1l22 22M16.72 11.06A10.94 10.94 0 0119 12.55M5 12.55a10.94 10.94 0 015.17-2.39M10.71 5.05A16 16 0 0122.58 9M1.42 9a15.91 15.91 0 014.7-2.88M8.53 16.11a6 6 0 016.95 0M12 20h.01"/></svg>
+    You're offline — showing the last loaded page. Reconnect to continue.
+</div>
+<script>
+function updateOnlineStatus() {
+    document.getElementById('offline-banner').style.display = navigator.onLine ? 'none' : 'block';
+}
+window.addEventListener('online', updateOnlineStatus);
+window.addEventListener('offline', updateOnlineStatus);
+updateOnlineStatus();
+</script>
+
+<div class="skeleton-overlay" id="skeletonOverlay">
+    <div class="skeleton-card"></div><div class="skeleton-card"></div><div class="skeleton-card"></div>
+    <div class="skeleton-card"></div><div class="skeleton-card"></div><div class="skeleton-card"></div>
+</div>
+<script>
+window.addEventListener('load', function() {
+    document.getElementById('skeletonOverlay').classList.add('hide');
+});
+</script>
+</body>
+</html>

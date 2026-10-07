@@ -1,0 +1,12 @@
+{
+  "appId": "com.roomradar.app",
+  "appName": "Hostel Radar",
+  "webDir": "www",
+  "server": {
+    "url": "https://chartertechnologies.pythonanywhere.com",
+    "cleartext": true,
+    "allowNavigation": [
+      "chartertechnologies.pythonanywhere.com"
+    ]
+  }
+}

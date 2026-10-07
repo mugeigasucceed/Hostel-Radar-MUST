@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Hostel Radar</title>
+<style>
+    body {
+        margin: 0;
+        height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-direction: column;
+        background: linear-gradient(135deg, #333399, #24246E);
+        color: white;
+        font-family: Arial, sans-serif;
+        text-align: center;
+        padding: 20px;
+        box-sizing: border-box;
+    }
+    h2 {
+        margin-bottom: 10px;
+    }
+    p {
+        color: #ddd;
+        margin-bottom: 20px;
+    }
+    button {
+        background: #FCB900;
+        color: #1A1A2E;
+        border: none;
+        padding: 12px 24px;
+        border-radius: 8px;
+        font-weight: bold;
+        font-size: 16px;
+    }
+    #status {
+        display: none;
+    }
+</style>
+</head>
+<body>
+    <div id="status">
+        <h2>No Internet Connection</h2>
+        <p>Hostel Radar needs an internet connection to load listings.</p>
+        <button onclick="checkConnection()">Try Again</button>
+    </div>
+
+<script>
+    const liveUrl = "https://chartertechnologies.pythonanywhere.com";
+
+    function checkConnection() {
+        fetch(liveUrl, { mode: 'no-cors', cache: 'no-store' })
+            .then(function() {
+                window.location.href = liveUrl;
+            })
+            .catch(function() {
+                document.getElementById('status').style.display = 'flex';
+            });
+    }
+
+    checkConnection();
+</script>
+</body>
+</html>

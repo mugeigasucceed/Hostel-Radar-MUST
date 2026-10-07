@@ -1,0 +1,96 @@
+{% extends "base.html" %}
+
+{% block title %}Manage Users - Room Radar{% endblock %}
+
+{% block extra_css %}
+<style>
+    .users-table-wrap { overflow-x: auto; }
+    table.users-table { width: 100%; border-collapse: collapse; background: var(--color-surface); border-radius: var(--radius-lg); overflow: hidden; box-shadow: var(--shadow-card); }
+    table.users-table th, table.users-table td { padding: 14px 18px; text-align: left; font-size: 14px; border-bottom: 1px solid var(--color-line); white-space: nowrap; }
+    table.users-table th { background: var(--color-paper); font-size: 12.5px; text-transform: uppercase; letter-spacing: 0.03em; color: var(--color-muted); font-weight: 700; }
+    table.users-table tr:last-child td { border-bottom: none; }
+
+    .role-pill { display: inline-flex; padding: 3px 10px; border-radius: 999px; font-size: 12px; font-weight: 600; background: var(--color-info-bg); color: var(--color-info); }
+    .status-active { color: var(--color-success); font-weight: 600; }
+    .status-banned { color: var(--color-danger); font-weight: 600; }
+
+    .pagination { display: flex; align-items: center; justify-content: center; gap: 18px; padding: 24px 0 8px; font-size: 14px; }
+    .pagination a { font-weight: 600; }
+    .pagination .page-info { color: var(--color-muted); }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="page-header">
+        <a href="{{ url_for('admin.dashboard') }}" style="font-size: 13.5px; font-weight: 600;">&larr; Back to admin dashboard</a>
+        <h1 style="margin-top: 10px;">Manage users</h1>
+        <p>View accounts and manage access.</p>
+    </div>
+
+    {% if users and users.items %}
+        <div class="users-table-wrap">
+            <table class="users-table">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Username</th>
+                        <th>Email</th>
+                        <th>Role</th>
+                        <th>Status</th>
+                        <th>Joined</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for user in users.items %}
+                        <tr>
+                            <td>{{ user.full_name }}</td>
+                            <td>{{ user.username }}</td>
+                            <td>{{ user.email }}</td>
+                            <td><span class="role-pill">{{ user.role.value|capitalize }}</span></td>
+                            <td>
+                                {% if user.is_active %}
+                                    <span class="status-active">Active</span>
+                                {% else %}
+                                    <span class="status-banned">Banned</span>
+                                {% endif %}
+                            </td>
+                            <td>{{ user.created_at|date_short }}</td>
+                            <td>
+                                {% if user.id != current_user.id %}
+                                    {% if user.is_active %}
+                                        <form method="POST" action="{{ url_for('admin.ban_user', user_id=user.id) }}" onsubmit="return confirm('Ban {{ user.username }}?');">
+                                            <button type="submit" class="btn btn-danger btn-sm">Ban</button>
+                                        </form>
+                                    {% else %}
+                                        <form method="POST" action="{{ url_for('admin.unban_user', user_id=user.id) }}">
+                                            <button type="submit" class="btn btn-secondary btn-sm">Unban</button>
+                                        </form>
+                                    {% endif %}
+                                {% else %}
+                                    <span style="color: var(--color-muted); font-size: 13px;">You</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <div class="pagination">
+            {% if users.has_prev %}
+                <a href="{{ url_for('admin.manage_users', page=users.prev_num) }}">&larr; Previous</a>
+            {% endif %}
+            <span class="page-info">Page {{ users.page }} of {{ users.pages }}</span>
+            {% if users.has_next %}
+                <a href="{{ url_for('admin.manage_users', page=users.next_num) }}">Next &rarr;</a>
+            {% endif %}
+        </div>
+    {% else %}
+        <div class="empty-state">
+            <p>No users found</p>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

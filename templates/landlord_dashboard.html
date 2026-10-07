@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+
+{% block title %}My Listings - Hostel Radar{% endblock %}
+
+{% block extra_css %}
+<style>
+    .stats-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 32px; }
+    .stat-card { padding: 20px; text-align: center; }
+    .stat-card .num { font-family: var(--font-display); font-size: 30px; color: var(--color-navy); }
+    .stat-card .label { color: var(--color-muted); font-size: 13px; margin-top: 4px; }
+    .listing-row { display: flex; align-items: center; justify-content: space-between; padding: 18px 20px; gap: 16px; }
+    .listing-row + .listing-row { border-top: 1px solid var(--color-line); }
+    .status-pill { padding: 4px 11px; border-radius: 999px; font-size: 12px; font-weight: 600; }
+    .status-approved { background: var(--color-sage-bg); color: var(--color-sage); }
+    .status-pending { background: #FCF3E3; color: #8A5B12; }
+    @media (max-width: 640px) { .stats-row { grid-template-columns: 1fr; } .listing-row { flex-direction: column; align-items: flex-start; } }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="page-header" style="display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:12px;">
+        <div>
+            <h1>My listings</h1>
+            <p>Manage the hostels you've listed on Hostel Radar.</p>
+        </div>
+        <a href="{{ url_for('hostels.create_hostel') }}" class="btn btn-primary">+ Add a listing</a>
+    </div>
+
+    <div class="stats-row">
+        <div class="card stat-card"><div class="num">{{ hostels|length }}</div><div class="label">Total listings</div></div>
+        <div class="card stat-card"><div class="num">{{ approved_count }}</div><div class="label">Approved</div></div>
+        <div class="card stat-card"><div class="num">{{ pending_count }}</div><div class="label">Pending review</div></div>
+    </div>
+
+    {% if hostels %}
+        <div class="card" style="padding:0; overflow:hidden;">
+            {% for hostel in hostels %}
+                <div class="listing-row">
+                    <div>
+                        <strong>{{ hostel.name }}</strong>
+                        <p style="color:var(--color-muted); font-size:13px; margin-top:3px;">{{ hostel.area }} &middot; {{ hostel.price_min|currency }} &ndash; {{ hostel.price_max|currency }}</p>
+                    </div>
+                    <div style="display:flex; align-items:center; gap:10px;">
+                        {% if hostel.is_approved %}
+                            <span class="status-pill status-approved">Approved</span>
+                        {% else %}
+                            <span class="status-pill status-pending">Pending</span>
+                        {% endif %}
+                        <a href="{{ url_for('hostels.edit_hostel', hostel_id=hostel.id) }}" class="btn btn-secondary btn-sm">Edit</a>
+                        <form method="POST" action="{{ url_for('hostels.delete_hostel', hostel_id=hostel.id) }}" onsubmit="return confirm('Remove this listing?');">
+                            <button type="submit" class="btn btn-danger btn-sm">Delete</button>
+                        </form>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="empty-state">
+            <p>No listings yet</p>
+            <p>Add your first hostel to get started.</p>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

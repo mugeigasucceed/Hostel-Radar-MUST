@@ -1,0 +1,68 @@
+{% extends "base.html" %}
+
+{% block title %}Pending Hostels - Room Radar{% endblock %}
+
+{% block extra_css %}
+<style>
+    .review-row { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 20px 24px; margin-bottom: 12px; }
+    .review-info h3 { font-size: 16px; margin-bottom: 4px; }
+    .review-meta { color: var(--color-muted); font-size: 13.5px; }
+    .review-price { font-family: var(--font-display); font-weight: 600; color: var(--color-navy); margin-top: 4px; }
+    .review-actions { display: flex; gap: 10px; flex-shrink: 0; }
+
+    .pagination { display: flex; align-items: center; justify-content: center; gap: 18px; padding: 24px 0 8px; font-size: 14px; }
+    .pagination a { font-weight: 600; }
+    .pagination .page-info { color: var(--color-muted); }
+
+    @media (max-width: 700px) {
+        .review-row { flex-direction: column; align-items: flex-start; }
+        .review-actions { width: 100%; }
+        .review-actions form, .review-actions .btn { flex: 1; }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="page-header">
+        <a href="{{ url_for('admin.dashboard') }}" style="font-size: 13.5px; font-weight: 600;">&larr; Back to admin dashboard</a>
+        <h1 style="margin-top: 10px;">Pending hostel approvals</h1>
+        <p>Review new listings before they go live for students.</p>
+    </div>
+
+    {% if hostels and hostels.items %}
+        {% for hostel in hostels.items %}
+            <div class="review-row card">
+                <div class="review-info">
+                    <h3>{{ hostel.name }}</h3>
+                    <p class="review-meta">{{ hostel.area }} &middot; {{ hostel.distance_from_campus }} km from campus &middot; {{ hostel.room_type|capitalize }} &middot; {{ hostel.gender_allowed|capitalize }}</p>
+                    <p class="review-price">{{ hostel.price_min|currency }} &ndash; {{ hostel.price_max|currency }}</p>
+                </div>
+                <div class="review-actions">
+                    <form method="POST" action="{{ url_for('admin.approve_hostel', hostel_id=hostel.id) }}">
+                        <button type="submit" class="btn btn-primary btn-sm">Approve</button>
+                    </form>
+                    <form method="POST" action="{{ url_for('admin.reject_hostel', hostel_id=hostel.id) }}" onsubmit="return confirm('Reject this listing?');">
+                        <button type="submit" class="btn btn-danger btn-sm">Reject</button>
+                    </form>
+                </div>
+            </div>
+        {% endfor %}
+
+        <div class="pagination">
+            {% if hostels.has_prev %}
+                <a href="{{ url_for('admin.pending_hostels', page=hostels.prev_num) }}">&larr; Previous</a>
+            {% endif %}
+            <span class="page-info">Page {{ hostels.page }} of {{ hostels.pages }}</span>
+            {% if hostels.has_next %}
+                <a href="{{ url_for('admin.pending_hostels', page=hostels.next_num) }}">Next &rarr;</a>
+            {% endif %}
+        </div>
+    {% else %}
+        <div class="empty-state">
+            <p>All caught up</p>
+            <p>There are no hostel listings waiting for review.</p>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

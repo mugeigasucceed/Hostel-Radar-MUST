@@ -1,0 +1,86 @@
+{% extends "base.html" %}
+
+{% block title %}Add a Listing - Hostel Radar{% endblock %}
+
+{% block extra_css %}
+<style>
+    .listing-form-card { max-width: 640px; margin: 0 auto; padding: 36px; }
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+    @media (max-width: 560px) { .form-row { grid-template-columns: 1fr; } .listing-form-card { padding: 24px 18px; } }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container" style="padding: 32px 0 56px;">
+    <div class="listing-form-card card">
+        <h2 style="margin-bottom:6px;">Add a hostel listing</h2>
+        <p style="color:var(--color-muted); font-size:14px; margin-bottom:26px;">Listings are reviewed before appearing publicly.</p>
+
+        <form method="POST" novalidate>
+            {{ form.csrf_token }}
+
+            <div class="form-group">
+                {{ form.name.label(class="form-label") }}
+                {{ form.name(class="form-input", placeholder="e.g. Sunrise Hostel") }}
+                {% for error in form.name.errors %}<div class="form-error"><p>{{ error }}</p></div>{% endfor %}
+            </div>
+
+            <div class="form-group">
+                {{ form.description.label(class="form-label") }}
+                {{ form.description(class="form-input", rows="3", placeholder="Describe the hostel") }}
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    {{ form.area.label(class="form-label") }}
+                    {{ form.area(class="form-input", placeholder="e.g. Nyamityobora") }}
+                </div>
+                <div class="form-group">
+                    {{ form.distance_from_campus.label(class="form-label") }}
+                    {{ form.distance_from_campus(class="form-input", placeholder="e.g. 1.5") }}
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    {{ form.price_min.label(class="form-label") }}
+                    {{ form.price_min(class="form-input", placeholder="e.g. 400000") }}
+                </div>
+                <div class="form-group">
+                    {{ form.price_max.label(class="form-label") }}
+                    {{ form.price_max(class="form-input", placeholder="e.g. 600000") }}
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    {{ form.gender_allowed.label(class="form-label") }}
+                    {{ form.gender_allowed(class="form-input") }}
+                </div>
+                <div class="form-group">
+                    {{ form.room_type.label(class="form-label") }}
+                    {{ form.room_type(class="form-input") }}
+                </div>
+            </div>
+
+            <div class="form-group">
+                {{ form.available_rooms.label(class="form-label") }}
+                {{ form.available_rooms(class="form-input", placeholder="How many rooms are open now") }}
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    {{ form.phone.label(class="form-label") }}
+                    {{ form.phone(class="form-input", placeholder="+256701234567") }}
+                </div>
+                <div class="form-group">
+                    {{ form.email.label(class="form-label") }}
+                    {{ form.email(class="form-input", placeholder="Optional") }}
+                </div>
+            </div>
+
+            {{ form.submit(class="btn btn-primary btn-block") }}
+        </form>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,184 @@
+{% extends "base.html" %}
+
+{% block title %}Log in - Hostel Radar{% endblock %}
+
+{% block extra_css %}
+<style>
+    .auth-page {
+        position: relative;
+        min-height: calc(100vh - 64px - 220px);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        overflow: hidden;
+        background: linear-gradient(160deg, var(--color-navy) 0%, var(--color-navy-deep) 100%);
+        padding: 64px 20px;
+    }
+
+    .radar-rings {
+        position: absolute;
+        top: 50%;
+        right: -180px;
+        transform: translateY(-50%);
+        width: 640px;
+        height: 640px;
+        pointer-events: none;
+    }
+
+        .radar-rings circle {
+        fill: none;
+        stroke: rgba(255,213,67,0.42);
+        stroke-width: 1.5;
+    }
+
+    .radar-rings .sweep {
+        stroke: rgba(255,213,67,0.85);
+        stroke-width: 2;
+    }
+
+    .auth-intro {
+        position: relative;
+        z-index: 2;
+        color: #fff;
+        max-width: 360px;
+        margin-right: 64px;
+    }
+
+    .auth-intro .eyebrow {
+        display: inline-flex;
+        align-items: center;
+        gap: 7px;
+        color: var(--color-amber);
+        font-weight: 600;
+        font-size: 13.5px;
+        margin-bottom: 18px;
+    }
+    .auth-intro .eyebrow::before {
+        content: '';
+        width: 7px; height: 7px; border-radius: 50%;
+        background: var(--color-amber);
+    }
+
+    .auth-intro h1 {
+        font-size: 34px;
+        color: #fff;
+        margin-bottom: 14px;
+        line-height: 1.15;
+    }
+
+    .auth-intro p {
+        color: rgba(255,255,255,0.72);
+        font-size: 15.5px;
+        line-height: 1.6;
+    }
+
+    .auth-shell {
+        position: relative;
+        z-index: 2;
+        display: flex;
+        align-items: center;
+        max-width: 900px;
+        width: 100%;
+    }
+
+    .auth-card {
+        background: var(--color-surface);
+        border-radius: var(--radius-lg);
+        padding: 44px 40px;
+        width: 100%;
+        max-width: 400px;
+        box-shadow: var(--shadow-elevated);
+    }
+
+    .auth-card h2 {
+        font-size: 22px;
+        margin-bottom: 4px;
+    }
+
+    .auth-card .sub {
+        color: var(--color-muted);
+        font-size: 14px;
+        margin-bottom: 28px;
+    }
+
+    .form-group-remember { margin-bottom: 24px; }
+
+    .auth-divider {
+        text-align: center;
+        margin: 22px 0;
+        font-size: 13px;
+        color: var(--color-muted);
+    }
+
+    @media (max-width: 860px) {
+        .auth-intro { display: none; }
+        .auth-shell { justify-content: center; }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="auth-page">
+    <svg class="radar-rings" viewBox="0 0 640 640" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+        <circle cx="320" cy="320" r="90" />
+        <circle cx="320" cy="320" r="170" />
+        <circle cx="320" cy="320" r="250" />
+        <circle cx="320" cy="320" r="320" />
+        <line class="sweep" x1="320" y1="320" x2="560" y2="150" />
+    </svg>
+
+    <div class="auth-shell">
+        <div class="auth-intro">
+            <span class="eyebrow">Hostel Radar &middot; MUST</span>
+            <h1>Find verified housing near campus, in minutes.</h1>
+            <p>Browse hostels by distance, price and amenities — every listing reviewed before it goes live.</p>
+        </div>
+
+        <div class="auth-card">
+            <h2>Welcome back</h2>
+            <p class="sub">Log in to browse listings</p>
+
+            <form method="POST" action="{{ url_for('auth.login') }}" novalidate>
+                {{ form.csrf_token }}
+
+                <div class="form-group">
+                    {{ form.email.label(class="form-label") }}
+                    {% if form.email.errors %}
+                        {{ form.email(class="form-input form-input-error", placeholder="you@example.com") }}
+                        <div class="form-error">
+                            {% for error in form.email.errors %}<p>{{ error }}</p>{% endfor %}
+                        </div>
+                    {% else %}
+                        {{ form.email(class="form-input", placeholder="you@example.com") }}
+                    {% endif %}
+                </div>
+
+                <div class="form-group">
+                    {{ form.password.label(class="form-label") }}
+                    {% if form.password.errors %}
+                        {{ form.password(class="form-input form-input-error", placeholder="Enter your password") }}
+                        <div class="form-error">
+                            {% for error in form.password.errors %}<p>{{ error }}</p>{% endfor %}
+                        </div>
+                    {% else %}
+                        {{ form.password(class="form-input", placeholder="Enter your password") }}
+                    {% endif %}
+                </div>
+
+                <div class="form-group form-group-remember">
+                    <label class="checkbox-label">
+                        {{ form.remember_me() }}
+                        <span>Remember me for 7 days</span>
+                    </label>
+                </div>
+
+                {{ form.submit(class="btn btn-primary btn-block") }}
+            </form>
+
+            <div class="auth-divider">Don't have an account?</div>
+
+            <a href="{{ url_for('auth.register') }}" class="btn btn-secondary btn-block">Create an account</a>
+        </div>
+    </div>
+</div>
+{% endblock %}

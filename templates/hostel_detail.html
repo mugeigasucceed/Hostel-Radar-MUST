@@ -1,0 +1,93 @@
+{% extends "base.html" %}
+
+{% block title %}{{ hostel.name }} - Hostel Radar{% endblock %}
+
+{% block extra_css %}
+<style>
+    .detail-layout { display: grid; grid-template-columns: 2fr 1fr; gap: 28px; padding: 32px 0 56px; }
+    .detail-main { padding: 28px; }
+    .detail-main h1 { font-size: 26px; margin-bottom: 6px; }
+    .amenity-pill { display: inline-block; background: var(--color-paper); border: 1px solid var(--color-line); border-radius: 999px; padding: 6px 13px; font-size: 13px; margin: 0 8px 8px 0; }
+    .detail-side { padding: 22px; align-self: start; }
+    .detail-side .price { font-family: var(--font-display); font-size: 24px; color: var(--color-navy); margin-bottom: 4px; }
+    .contact-row { display: flex; justify-content: space-between; font-size: 14px; padding: 9px 0; border-bottom: 1px solid var(--color-line); }
+    .contact-row:last-child { border-bottom: none; }
+    @media (max-width: 860px) { .detail-layout { grid-template-columns: 1fr; } }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="detail-layout">
+        <div class="detail-main card">
+            {% if hostel.distance_from_campus <= 1 %}
+                <span class="radar-badge radar-near">{{ hostel.distance_from_campus }} km from campus</span>
+            {% elif hostel.distance_from_campus <= 3 %}
+                <span class="radar-badge radar-mid">{{ hostel.distance_from_campus }} km from campus</span>
+            {% else %}
+                <span class="radar-badge radar-far">{{ hostel.distance_from_campus }} km from campus</span>
+            {% endif %}
+
+            <h1 style="margin-top:14px;">{{ hostel.name }}</h1>
+            <p class="hostel-meta" style="color:var(--color-muted); margin-bottom:18px;">{{ hostel.area }}</p>
+
+            {% if hostel.description %}
+                <p style="margin-bottom:20px; line-height:1.7;">{{ hostel.description }}</p>
+            {% endif %}
+
+            <h3 style="font-size:15px; margin-bottom:10px;">Amenities</h3>
+            <div style="margin-bottom:8px;">
+                {% for amenity in hostel.get_amenities_list() %}
+                    <span class="amenity-pill">{{ amenity|capitalize }}</span>
+                {% else %}
+                    <p style="color:var(--color-muted); font-size:14px;">No amenities listed.</p>
+                {% endfor %}
+            </div>
+
+            {% if pending_reports %}
+                <div class="alert alert-warning" style="border-radius:8px; margin-top:20px;">
+                    <div class="container" style="padding:10px 14px;">{{ pending_reports }} pending report(s) on this listing.</div>
+                </div>
+            {% endif %}
+
+            {% if current_user.is_authenticated %}
+            <details style="margin-top:24px;">
+                <summary style="cursor:pointer; font-weight:600; color:var(--color-danger); font-size:14px;">Report this listing</summary>
+                <form method="POST" action="{{ url_for('hostels.report_hostel', hostel_id=hostel.id) }}" style="margin-top:14px;">
+                    {{ report_form.csrf_token }}
+                    <div class="form-group">
+                        {{ report_form.reason.label(class="form-label") }}
+                        {{ report_form.reason(class="form-input") }}
+                    </div>
+                    <div class="form-group">
+                        {{ report_form.description.label(class="form-label") }}
+                        {{ report_form.description(class="form-input", rows="3") }}
+                    </div>
+                    {{ report_form.submit(class="btn btn-danger") }}
+                </form>
+            </details>
+            {% endif %}
+        </div>
+
+        <div class="detail-side card">
+            <p class="price">{{ hostel.price_min|currency }}</p>
+            <p style="color:var(--color-muted); font-size:13px; margin-bottom:16px;">per semester</p>
+
+            <div class="contact-row"><span>Room type</span><strong>{{ hostel.room_type|capitalize }}</strong></div>
+            <div class="contact-row"><span>Gender</span><strong>{{ hostel.gender_allowed|capitalize }}</strong></div>
+            {% if hostel.available_rooms is not none %}
+            <div class="contact-row"><span>Available rooms</span><strong>{{ hostel.available_rooms }}</strong></div>
+            {% endif %}
+            <div class="contact-row"><span>Phone</span><strong>{{ hostel.phone }}</strong></div>
+            {% if hostel.email %}
+            <div class="contact-row"><span>Email</span><strong>{{ hostel.email }}</strong></div>
+            {% endif %}
+            {% if owner %}
+            <div class="contact-row"><span>Listed by</span><strong>{{ owner.full_name }}</strong></div>
+            {% endif %}
+
+            <a href="tel:{{ hostel.phone }}" class="btn btn-primary btn-block" style="margin-top:18px;">Call landlord</a>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,95 @@
+{% extends "base.html" %}
+
+{% block title %}Search Hostels - Hostel Radar{% endblock %}
+
+{% block extra_css %}
+<style>
+    .search-layout { display: grid; grid-template-columns: 280px 1fr; gap: 28px; padding: 32px 0 56px; }
+    .search-filters { padding: 22px; align-self: start; position: sticky; top: 88px; }
+    .search-filters .form-group { margin-bottom: 16px; }
+    .hostel-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(270px, 1fr)); gap: 20px; }
+    .hostel-card { display: flex; flex-direction: column; overflow: hidden; }
+    .hostel-card-body { padding: 20px; display: flex; flex-direction: column; gap: 10px; flex: 1; }
+    .hostel-card h3 { font-size: 17px; }
+    .hostel-meta { color: var(--color-muted); font-size: 13.5px; }
+    .hostel-price { font-family: var(--font-display); font-weight: 600; font-size: 17px; color: var(--color-navy); }
+    .hostel-card .btn { margin-top: auto; }
+    @media (max-width: 860px) {
+        .search-layout { grid-template-columns: 1fr; }
+        .search-filters { position: static; }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="page-header">
+        <h1>Search hostels</h1>
+        <p>Filter by location, price, and distance from campus.</p>
+    </div>
+
+    <div class="search-layout">
+        <form method="GET" class="card search-filters">
+            <div class="form-group">
+                {{ form.location.label(class="form-label") }}
+                {{ form.location(class="form-input", placeholder="e.g. Nyamityobora") }}
+            </div>
+            <div class="form-group">
+                {{ form.price_min.label(class="form-label") }}
+                {{ form.price_min(class="form-input", placeholder="Min UGX") }}
+            </div>
+            <div class="form-group">
+                {{ form.price_max.label(class="form-label") }}
+                {{ form.price_max(class="form-input", placeholder="Max UGX") }}
+            </div>
+            <div class="form-group">
+                {{ form.gender.label(class="form-label") }}
+                {{ form.gender(class="form-input") }}
+            </div>
+            <div class="form-group">
+                {{ form.room_type.label(class="form-label") }}
+                {{ form.room_type(class="form-input") }}
+            </div>
+            <div class="form-group">
+                {{ form.amenities.label(class="form-label") }}
+                {{ form.amenities(class="form-input", placeholder="wifi, water, parking") }}
+            </div>
+            {{ form.submit(class="btn btn-primary btn-block") }}
+        </form>
+
+        <div>
+            {% if hostels and hostels.items %}
+                <div class="hostel-grid">
+                    {% for hostel in hostels.items %}
+                        <div class="hostel-card card">
+                            <div class="hostel-card-body">
+                                {% if hostel.distance_from_campus <= 1 %}
+                                    <span class="radar-badge radar-near">{{ hostel.distance_from_campus }} km from campus</span>
+                                {% elif hostel.distance_from_campus <= 3 %}
+                                    <span class="radar-badge radar-mid">{{ hostel.distance_from_campus }} km from campus</span>
+                                {% else %}
+                                    <span class="radar-badge radar-far">{{ hostel.distance_from_campus }} km from campus</span>
+                                {% endif %}
+                                <h3>{{ hostel.name }}</h3>
+                                <p class="hostel-meta">{{ hostel.area }} &middot; {{ hostel.room_type|capitalize }}</p>
+                                <p class="hostel-price">{{ hostel.price_min|currency }}</p>
+                                <a href="{{ url_for('hostels.detail', hostel_id=hostel.id) }}" class="btn btn-primary btn-block">View details</a>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% elif filters_applied %}
+                <div class="empty-state">
+                    <p>No matches found</p>
+                    <p>Try widening your price range or clearing a filter.</p>
+                </div>
+            {% else %}
+                <div class="empty-state">
+                    <p>Start your search</p>
+                    <p>Use the filters on the left to find a hostel that fits.</p>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

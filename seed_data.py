@@ -1,0 +1,19 @@
+from app import app, db
+from models import Hostel
+
+with app.app_context():
+    listings = [
+        Hostel(owner_id=1, name="Sunrise Hostel", description="Quiet, secure hostel with reliable water and power.", area="Nyamityobora", distance_from_campus=0.8, price_min=350000, price_max=450000, gender_allowed="female", room_type="single", available_rooms=4, amenities="wifi,water,electricity,parking", phone="+256701234567", is_approved=True, is_active=True),
+        Hostel(owner_id=1, name="Campus View Hostel", description="Walking distance to lecture halls, great for first-years.", area="Kakoba", distance_from_campus=0.5, price_min=300000, price_max=400000, gender_allowed="both", room_type="shared", available_rooms=8, amenities="wifi,water,electricity", phone="+256702345678", is_approved=True, is_active=True),
+        Hostel(owner_id=1, name="Greenhill Residences", description="Modern rooms with a study area and backup generator.", area="Ruharo", distance_from_campus=2.1, price_min=500000, price_max=650000, gender_allowed="male", room_type="double", available_rooms=6, amenities="wifi,water,electricity,parking,generator", phone="+256703456789", is_approved=True, is_active=True),
+        Hostel(owner_id=1, name="Blue Gate Hostel", description="Affordable shared rooms with a communal kitchen.", area="Kakiika", distance_from_campus=1.6, price_min=250000, price_max=350000, gender_allowed="both", room_type="shared", available_rooms=10, amenities="wifi,water", phone="+256704567890", is_approved=True, is_active=True),
+        Hostel(owner_id=1, name="Fountain Court", description="Gated compound with 24/7 security and CCTV.", area="Biharwe", distance_from_campus=3.4, price_min=450000, price_max=550000, gender_allowed="female", room_type="single", available_rooms=3, amenities="wifi,water,electricity,security,parking", phone="+256705678901", is_approved=True, is_active=True),
+        Hostel(owner_id=1, name="Unity Hall", description="Popular hostel among engineering students, close to labs.", area="Nyamityobora", distance_from_campus=1.0, price_min=380000, price_max=480000, gender_allowed="male", room_type="double", available_rooms=5, amenities="wifi,water,electricity", phone="+256706789012", is_approved=True, is_active=True),
+        Hostel(owner_id=1, name="Lakeview Apartments", description="Spacious rooms with a scenic view, slightly further from campus.", area="Katete", distance_from_campus=4.2, price_min=550000, price_max=700000, gender_allowed="both", room_type="single", available_rooms=2, amenities="wifi,water,electricity,parking", phone="+256707890123", is_approved=True, is_active=True),
+        Hostel(owner_id=1, name="Scholars Den", description="Study-friendly environment with a quiet reading room.", area="Kakoba", distance_from_campus=0.9, price_min=320000, price_max=420000, gender_allowed="female", room_type="shared", available_rooms=7, amenities="wifi,water,electricity", phone="+256708901234", is_approved=True, is_active=True),
+        Hostel(owner_id=1, name="Pioneer Hostel", description="Budget-friendly option with basic amenities.", area="Kakiika", distance_from_campus=2.8, price_min=220000, price_max=300000, gender_allowed="both", room_type="shared", available_rooms=12, amenities="water,electricity", phone="+256709012345", is_approved=True, is_active=True),
+        Hostel(owner_id=1, name="Golden Gate Residences", description="Premium hostel with en-suite rooms and reliable WiFi.", area="Ruharo", distance_from_campus=1.9, price_min=600000, price_max=750000, gender_allowed="male", room_type="single", available_rooms=4, amenities="wifi,water,electricity,parking,security", phone="+256700123456", is_approved=True, is_active=True),
+    ]
+    db.session.add_all(listings)
+    db.session.commit()
+    print("Sample listings created:", len(listings))

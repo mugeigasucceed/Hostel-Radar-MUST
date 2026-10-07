@@ -1,0 +1,91 @@
+{% extends "base.html" %}
+
+{% block title %}Browse Hostels - Hostel Radar{% endblock %}
+
+{% block extra_css %}
+<style>
+    .hostel-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+        gap: 20px;
+        padding-bottom: 48px;
+    }
+
+    .hostel-card {
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+        transition: box-shadow 0.15s ease, transform 0.15s ease;
+    }
+    .hostel-card:hover { box-shadow: 0 4px 8px rgba(18,33,58,0.08), 0 16px 32px rgba(18,33,58,0.1); transform: translateY(-2px); }
+
+    .hostel-card-body { padding: 20px; display: flex; flex-direction: column; gap: 10px; flex: 1; }
+
+    .hostel-card h3 { font-size: 17px; }
+
+    .hostel-meta { color: var(--color-muted); font-size: 13.5px; }
+
+    .hostel-price { font-family: var(--font-display); font-weight: 600; font-size: 17px; color: var(--color-navy); margin-top: 4px; }
+
+    .hostel-card .btn { margin-top: auto; }
+
+    .pagination {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 18px;
+        padding: 8px 0 56px;
+        font-size: 14px;
+    }
+    .pagination a { font-weight: 600; }
+    .pagination .page-info { color: var(--color-muted); }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="page-header">
+        <h1>Welcome back, {{ current_user.full_name.split(' ')[0] }}</h1>
+        <p>Verified hostels near MUST, sorted by distance from campus.</p>
+    </div>
+
+    {% if hostels and hostels.items %}
+        <div class="hostel-grid">
+            {% for hostel in hostels.items %}
+                <div class="hostel-card card">
+                    <div class="hostel-card-body">
+                        {% if hostel.distance_from_campus <= 1 %}
+                            <span class="radar-badge radar-near">{{ hostel.distance_from_campus }} km from campus</span>
+                        {% elif hostel.distance_from_campus <= 3 %}
+                            <span class="radar-badge radar-mid">{{ hostel.distance_from_campus }} km from campus</span>
+                        {% else %}
+                            <span class="radar-badge radar-far">{{ hostel.distance_from_campus }} km from campus</span>
+                        {% endif %}
+
+                                                <h3>{{ hostel.name }} {% if hostel.is_approved %}<span class="verified-check" title="Verified listing"><svg viewBox="0 0 22 22" fill="#1D9BF0" xmlns="http://www.w3.org/2000/svg"><path d="M11 0.5l2.4 1.9 3-0.6 1.2 2.8 2.8 1.2-0.6 3 1.9 2.4-1.9 2.4 0.6 3-2.8 1.2-1.2 2.8-3-0.6L11 21.5l-2.4-1.9-3 0.6-1.2-2.8-2.8-1.2 0.6-3L0.3 11l1.9-2.4-0.6-3 2.8-1.2 1.2-2.8 3 0.6L11 0.5z"/><path d="M9.2 14.8l-3.3-3.3 1.2-1.2 2.1 2.1 5-5 1.2 1.2-6.2 6.2z" fill="#fff"/></svg></span>{% endif %}</h3>
+                        <p class="hostel-meta">{{ hostel.area }} &middot; {{ hostel.room_type|capitalize }} &middot; {{ hostel.gender_allowed|capitalize }}</p>
+                        <p class="hostel-price">{{ hostel.price_min|currency }}</p>
+
+                        <a href="{{ url_for('hostels.detail', hostel_id=hostel.id) }}" class="btn btn-primary btn-block">View details</a>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+
+        <div class="pagination">
+            {% if hostels.has_prev %}
+                <a href="{{ url_for('hostels.dashboard', page=hostels.prev_num) }}">&larr; Previous</a>
+            {% endif %}
+            <span class="page-info">Page {{ hostels.page }} of {{ hostels.pages }}</span>
+            {% if hostels.has_next %}
+                <a href="{{ url_for('hostels.dashboard', page=hostels.next_num) }}">Next &rarr;</a>
+            {% endif %}
+        </div>
+    {% else %}
+        <div class="empty-state">
+            <p>No hostels listed yet</p>
+            <p>Check back soon — new listings are reviewed and added regularly.</p>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

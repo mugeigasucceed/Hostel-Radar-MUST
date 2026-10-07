@@ -1,0 +1,101 @@
+{% extends "base.html" %}
+
+{% block title %}Admin Dashboard - Room Radar{% endblock %}
+
+{% block extra_css %}
+<style>
+    .admin-nav { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 28px; }
+
+    .stats-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 36px; }
+    .stat-box { padding: 20px 22px; }
+    .stat-box .num { font-family: var(--font-display); font-size: 28px; font-weight: 700; color: var(--color-navy); }
+    .stat-box .label { color: var(--color-muted); font-size: 13.5px; margin-top: 2px; }
+    .stat-box.alert .num { color: var(--color-danger); }
+
+    .panels { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+    .panel { padding: 22px 24px; }
+    .panel-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
+    .panel-header h3 { font-size: 15.5px; }
+    .panel-header a { font-size: 13px; font-weight: 600; }
+
+    .mini-row { display: flex; justify-content: space-between; align-items: center; padding: 11px 0; border-bottom: 1px solid var(--color-line); font-size: 14px; }
+    .mini-row:last-child { border-bottom: none; }
+    .mini-row .sub { color: var(--color-muted); font-size: 12.5px; }
+
+    @media (max-width: 860px) {
+        .stats-row { grid-template-columns: 1fr 1fr; }
+        .panels { grid-template-columns: 1fr; }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="page-header">
+        <h1>Admin dashboard</h1>
+        <p>Overview of pending approvals, reports and platform activity.</p>
+    </div>
+
+    <div class="admin-nav">
+        <a href="{{ url_for('admin.pending_hostels') }}" class="btn btn-secondary btn-sm">Pending hostels</a>
+        <a href="{{ url_for('admin.pending_reports') }}" class="btn btn-secondary btn-sm">Pending reports</a>
+        <a href="{{ url_for('admin.manage_users') }}" class="btn btn-secondary btn-sm">Manage users</a>
+        <a href="{{ url_for('admin.audit_log') }}" class="btn btn-secondary btn-sm">Audit log</a>
+    </div>
+
+    <div class="stats-row">
+        <div class="stat-box card {{ 'alert' if pending_hostels else '' }}">
+            <div class="num">{{ pending_hostels }}</div>
+            <div class="label">Pending hostels</div>
+        </div>
+        <div class="stat-box card {{ 'alert' if pending_reports else '' }}">
+            <div class="num">{{ pending_reports }}</div>
+            <div class="label">Pending reports</div>
+        </div>
+        <div class="stat-box card">
+            <div class="num">{{ total_hostels }}</div>
+            <div class="label">Live hostels</div>
+        </div>
+        <div class="stat-box card">
+            <div class="num">{{ total_users }}</div>
+            <div class="label">Total users</div>
+        </div>
+    </div>
+
+    <div class="panels">
+        <div class="panel card">
+            <div class="panel-header">
+                <h3>Recent pending hostels</h3>
+                <a href="{{ url_for('admin.pending_hostels') }}">View all</a>
+            </div>
+            {% if recent_hostels %}
+                {% for hostel in recent_hostels %}
+                    <div class="mini-row">
+                        <span>{{ hostel.name }}</span>
+                        <span class="sub">{{ hostel.created_at|date_short }}</span>
+                    </div>
+                {% endfor %}
+            {% else %}
+                <p class="sub">Nothing pending right now.</p>
+            {% endif %}
+        </div>
+
+        <div class="panel card">
+            <div class="panel-header">
+                <h3>Recent pending reports</h3>
+                <a href="{{ url_for('admin.pending_reports') }}">View all</a>
+            </div>
+            {% if recent_reports %}
+                {% for report in recent_reports %}
+                    <div class="mini-row">
+                        <span>{{ report.reason|capitalize }}</span>
+                        <span class="sub">{{ report.created_at|date_short }}</span>
+                    </div>
+                {% endfor %}
+            {% else %}
+                <p class="sub">No open reports.</p>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

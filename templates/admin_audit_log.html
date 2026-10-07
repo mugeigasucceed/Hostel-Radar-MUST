@@ -1,0 +1,69 @@
+{% extends "base.html" %}
+
+{% block title %}Audit Log - Room Radar{% endblock %}
+
+{% block extra_css %}
+<style>
+    .log-row { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; padding: 16px 22px; margin-bottom: 10px; }
+    .log-action { font-weight: 600; font-size: 14.5px; }
+    .log-detail { color: var(--color-muted); font-size: 13.5px; margin-top: 3px; }
+    .log-meta { text-align: right; flex-shrink: 0; color: var(--color-muted); font-size: 12.5px; }
+    .action-tag {
+        display: inline-block; padding: 3px 9px; border-radius: 999px;
+        font-size: 11.5px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.03em;
+        margin-right: 8px; background: var(--color-paper); color: var(--color-navy);
+    }
+
+    .pagination { display: flex; align-items: center; justify-content: center; gap: 18px; padding: 24px 0 8px; font-size: 14px; }
+    .pagination a { font-weight: 600; }
+    .pagination .page-info { color: var(--color-muted); }
+
+    @media (max-width: 640px) {
+        .log-row { flex-direction: column; }
+        .log-meta { text-align: left; }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="page-header">
+        <a href="{{ url_for('admin.dashboard') }}" style="font-size: 13.5px; font-weight: 600;">&larr; Back to admin dashboard</a>
+        <h1 style="margin-top: 10px;">Audit log</h1>
+        <p>A record of every admin action taken on Room Radar.</p>
+    </div>
+
+    {% if logs and logs.items %}
+        {% for log in logs.items %}
+            <div class="log-row card">
+                <div>
+                    <div class="log-action">
+                        <span class="action-tag">{{ log.target_type }}</span>{{ log.action.replace('_', ' ')|capitalize }}
+                    </div>
+                    {% if log.details %}
+                        <div class="log-detail">{{ log.details }}</div>
+                    {% endif %}
+                </div>
+                <div class="log-meta">
+                    <div>{{ log.created_at|date_short }}</div>
+                    {% if log.ip_address %}<div>{{ log.ip_address }}</div>{% endif %}
+                </div>
+            </div>
+        {% endfor %}
+
+        <div class="pagination">
+            {% if logs.has_prev %}
+                <a href="{{ url_for('admin.audit_log', page=logs.prev_num) }}">&larr; Previous</a>
+            {% endif %}
+            <span class="page-info">Page {{ logs.page }} of {{ logs.pages }}</span>
+            {% if logs.has_next %}
+                <a href="{{ url_for('admin.audit_log', page=logs.next_num) }}">Next &rarr;</a>
+            {% endif %}
+        </div>
+    {% else %}
+        <div class="empty-state">
+            <p>No actions logged yet</p>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

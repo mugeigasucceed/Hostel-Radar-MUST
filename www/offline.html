@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<style>
+  body { margin:0; background:#1D3557; color:#fff; font-family:Arial,sans-serif; height:100vh; display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; padding:20px; }
+  svg { margin-bottom:20px; }
+  h1 { font-size:20px; margin-bottom:8px; }
+  p { color:rgba(255,255,255,0.7); font-size:14px; margin-bottom:24px; }
+  button { background:#FCB900; color:#1A1A2E; border:none; padding:12px 28px; border-radius:8px; font-weight:700; font-size:15px; cursor:pointer; }
+  button:disabled { opacity:0.6; }
+  #status { margin-top:14px; font-size:13px; color:#FCB900; min-height:18px; }
+</style>
+</head>
+<body>
+  <svg width="60" height="60" viewBox="0 0 24 24" fill="none" stroke="#FCB900" stroke-width="2"><path d="M1 1l22 22M16.72 11.06A10.94 10.94 0 0119 12.55M5 12.55a10.94 10.94 0 015.17-2.39M10.71 5.05A16 16 0 0122.58 9M1.42 9a15.91 15.91 0 014.7-2.88M8.53 16.11a6 6 0 016.95 0M12 20h.01"/></svg>
+  <h1>You're offline</h1>
+  <p>Check your internet connection and try again.</p>
+  <button id="retryBtn" onclick="tryAgain()">Try Again</button>
+  <div id="status"></div>
+
+<script>
+function tryAgain() {
+    const btn = document.getElementById('retryBtn');
+    const status = document.getElementById('status');
+    btn.disabled = true;
+    status.textContent = 'Checking...';
+
+    fetch('https://chartertechnologies.pythonanywhere.com', { mode: 'no-cors', cache: 'no-store' })
+        .then(() => {
+            status.textContent = 'Connected! Loading...';
+            window.location.href = 'https://chartertechnologies.pythonanywhere.com';
+        })
+        .catch(() => {
+            btn.disabled = false;
+            status.textContent = 'Still offline. Try again.';
+        });
+}
+</script>
+</body>
+</html>
